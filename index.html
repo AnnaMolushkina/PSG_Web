@@ -1,52 +1,49 @@
 <!DOCTYPE html>
- <html>
- <head>
-     <title>PSG Game_web</title>
-     <meta charset="UTF-8">
-     <style>
-         body { 
-             margin: 0;
-             padding: 0;
-             background: #000;
-             display: flex;
-             justify-content: center;
-             align-items: center;
-             height: 100vh;
-             overflow: hidden;
-         }
-         #game-frame {
-             width: 960px;
-             height: 540px;
-             border: none;
-         }
-     </style>
- </head>
- <body>
-     <iframe id="game-frame" 
-             src="https://drive.google.com/embeddedfolderview?id=18jnCpYj5_U5NBi4EbmXkrm7TVh5M0XlS?usp=drive_link#list"
-             allowfullscreen>
-     </iframe>
- 
-     <script>
-         // Автоматический ресайз под размер окна
-         function resizeGame() {
-             const frame = document.getElementById('game-frame');
-             const ratio = 16 / 9; // Соотношение сторон вашей игры
-             
-             let width = window.innerWidth;
-             let height = width / ratio;
-             
-             if (height > window.innerHeight) {
-                 height = window.innerHeight;
-                 width = height * ratio;
-             }
-             
-             frame.style.width = width + 'px';
-             frame.style.height = height + 'px';
-         }
- 
-         window.addEventListener('resize', resizeGame);
-         resizeGame();
-     </script>
- </body>
- </html>
+<html>
+<head>
+    <title>PSG Game</title>
+    <meta charset="UTF-8">
+    <style>
+        body { 
+            margin: 0; 
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        #game-container {
+            width: 960px;
+            height: 540px;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container"></div>
+
+    <script>
+        // Получаем прямые ссылки на файлы
+        const GDRIVE_IDS = {
+            loader: "18jnCpYj5_U5NBi4EbmXkrm7TVh5M0XlS?usp=drive_link_LOADER_JS",
+            data: "18jnCpYj5_U5NBi4EbmXkrm7TVh5M0XlS?usp=drive_link_DATA",
+            wasm: "18jnCpYj5_U5NBi4EbmXkrm7TVh5M0XlS?usp=drive_link_WASM"
+        };
+
+        // Создаем скрипт UnityLoader
+        const script = document.createElement('script');
+        script.src = `https://drive.google.com/uc?export=download&id=${GDRIVE_IDS.loader}`;
+        script.onload = () => {
+            UnityLoader.instantiate("game-container", {
+                dataUrl: `https://drive.google.com/uc?export=download&id=${GDRIVE_IDS.data}`,
+                frameworkUrl: `https://drive.google.com/uc?export=download&id=${GDRIVE_IDS.framework}`,
+                codeUrl: `https://drive.google.com/uc?export=download&id=${GDRIVE_IDS.wasm}`,
+                streamingAssetsUrl: "StreamingAssets",
+                companyName: "MyGameStudio",
+                productName: "MyWebGLGame",
+                productVersion: "1.0"
+            });
+        };
+        document.body.appendChild(script);
+    </script>
+</body>
+</html>
