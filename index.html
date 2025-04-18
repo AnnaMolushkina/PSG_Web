@@ -22,24 +22,33 @@
     <div id="game-container"></div>
 
     <script>
-        // Получаем прямые ссылки на файлы
-        const GDRIVE_IDS = {
-            loader: "18jnCpYj5_U5NBi4EbmXkrm7TVh5M0XlS?usp=drive_link_LOADER_JS",
-            data: "18jnCpYj5_U5NBi4EbmXkrm7TVh5M0XlS?usp=drive_link_DATA",
-            wasm: "18jnCpYj5_U5NBi4EbmXkrm7TVh5M0XlS?usp=drive_link_WASM"
+        // ID вашего ZIP-архива на Google Drive
+        const ZIP_ID = "18jnCpYj5_U5NBi4EbmXkrm7TVh5M0XlS";
+        
+        // Имена файлов внутри ZIP (должны точно совпадать)
+        const FILE_NAMES = {
+            loader: "Build/WebBuildPSG.loader.js",
+            data: "Build/WebBuildPSG.data",
+            wasm: "Build/WebBuildPSG.wasm",
+            framework: "Build/WebBuildPSG.framework.js"
         };
 
-        // Создаем скрипт UnityLoader
+        // Генерация прямых ссылок
+        function getGDriveFileUrl(filename) {
+            return `https://drive.google.com/uc?export=download&id=${ZIP_ID}&export=download&confirm=t&resourcekey=0-${ZIP_ID}&path=%2F${encodeURIComponent(filename)}`;
+        }
+
+        // Загрузка игры
         const script = document.createElement('script');
-        script.src = `https://drive.google.com/uc?export=download&id=${GDRIVE_IDS.loader}`;
+        script.src = getGDriveFileUrl(FILE_NAMES.loader);
         script.onload = () => {
             UnityLoader.instantiate("game-container", {
-                dataUrl: `https://drive.google.com/uc?export=download&id=${GDRIVE_IDS.data}`,
-                frameworkUrl: `https://drive.google.com/uc?export=download&id=${GDRIVE_IDS.framework}`,
-                codeUrl: `https://drive.google.com/uc?export=download&id=${GDRIVE_IDS.wasm}`,
-                streamingAssetsUrl: "StreamingAssets",
-                companyName: "MyGameStudio",
-                productName: "MyWebGLGame",
+                dataUrl: getGDriveFileUrl(FILE_NAMES.data),
+                frameworkUrl: getGDriveFileUrl(FILE_NAMES.framework),
+                codeUrl: getGDriveFileUrl(FILE_NAMES.wasm),
+                streamingAssetsUrl: getGDriveFileUrl("StreamingAssets"),
+                companyName: "PSG Game",
+                productName: "PSG WebGL",
                 productVersion: "1.0"
             });
         };
