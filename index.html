@@ -1,52 +1,108 @@
 <!DOCTYPE html>
- <html>
- <head>
-     <title>PSG Game</title>
-     <meta charset="UTF-8">
-     <style>
-         body { 
-             margin: 0;
-             padding: 0;
-             background: #000;
-             display: flex;
-             justify-content: center;
-             align-items: center;
-             height: 100vh;
-             overflow: hidden;
-         }
-         #game-frame {
-             width: 960px;
-             height: 540px;
-             border: none;
-         }
-     </style>
- </head>
- <body>
-     <iframe id="game-frame" 
-             src="https://drive.google.com/embeddedfolderview?id=18jnCpYj5_U5NBi4EbmXkrm7TVh5M0XlS#list"
-             allowfullscreen>
-     </iframe>
- 
-     <script>
-         // Автоматический ресайз под размер окна
-         function resizeGame() {
-             const frame = document.getElementById('game-frame');
-             const ratio = 16 / 9; // Соотношение сторон вашей игры
-             
-             let width = window.innerWidth;
-             let height = width / ratio;
-             
-             if (height > window.innerHeight) {
-                 height = window.innerHeight;
-                 width = height * ratio;
-             }
-             
-             frame.style.width = width + 'px';
-             frame.style.height = height + 'px';
-         }
- 
-         window.addEventListener('resize', resizeGame);
-         resizeGame();
-     </script>
- </body>
- </html>
+<html>
+<head>
+    <title>PSG Game</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="Access-Control-Allow-Origin" content="*">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            color: white;
+            overflow: hidden;
+        }
+        #game-container {
+            width: 960px;
+            height: 540px;
+            position: relative;
+        }
+        #loading {
+            position: absolute;
+            top: 20px;
+            width: 100%;
+            text-align: center;
+        }
+        #fullscreen-btn {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="loading">Инициализация игры...</div>
+        <button id="fullscreen-btn" onclick="toggleFullscreen()">Полный экран</button>
+    </div>
+
+    <script>
+        // Конфигурация (ЗАМЕНИТЕ ЭТИ ID НА РЕАЛЬНЫЕ)
+        const DRIVE_FOLDER_ID = "18jnCpYj5_U5NBi4EbmXkrm7TVh5M0XlS";
+        const FILE_IDS = {
+            loader: "12gCickepVoZAFCULFNylcZjibuhZQIp7",  // ID файла Build/WebBuildPSG.loader.js
+            data: "1EfT_TLIZgFFgIMPwY-kMBdKFkvvqbjJB",    // ID файла Build/WebBuildPSG.data
+            wasm: "1f-uq_mheJ6WWwOfBsC7zYt346UF2aDhA",    // ID файла Build/WebBuildPSG.wasm
+            framework: "1OiU5U901trXlFsE4qz_AikX_YakndBFc" // ID файла Build/WebBuildPSG.framework.js
+        };
+
+        // Генерация ссылок
+        function getDriveUrl(fileId) {
+            return `https://drive.google.com/uc?export=download&id=${fileId}&confirm=t`;
+        }
+
+        // Полноэкранный режим
+        function toggleFullscreen() {
+            const container = document.getElementById('game-container');
+            if (container.requestFullscreen) {
+                container.requestFullscreen();
+            }
+        }
+
+        // Загрузка игры
+        function loadGame() {
+            const loadingText = document.getElementById('loading');
+            
+            loadingText.textContent = "Загрузка скриптов...";
+            const script = document.createElement('script');
+            script.src = getDriveUrl(FILE_IDS.loader);
+            
+            script.onload = function() {
+                loadingText.textContent = "Инициализация...";
+                
+                UnityLoader.instantiate("game-container", {
+                    dataUrl: getDriveUrl(FILE_IDS.data),
+                    frameworkUrl: getDriveUrl(FILE_IDS.framework),
+                    codeUrl: getDriveUrl(FILE_IDS.wasm),
+                    streamingAssetsUrl: `https://drive.google.com/drive/folders/${DRIVE_FOLDER_ID}?usp=sharing`,
+                    companyName: "PSG",
+                    productName: "Interactive Story",
+                    productVersion: "1.0"
+                });
+                
+                loadingText.style.display = "none";
+            };
+            
+            script.onerror = function() {
+                loadingText.textContent = "Ошибка загрузки! Проверьте консоль (F12)";
+            };
+            
+            document.body.appendChild(script);
+        }
+
+        // Запуск после загрузки страницы
+        window.addEventListener('DOMContentLoaded', loadGame);
+    </script>
+</body>
+</html>
